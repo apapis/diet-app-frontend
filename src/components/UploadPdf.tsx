@@ -1,9 +1,15 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button, CircularProgress, Typography, Box } from "@mui/material";
-import { uploadPdf } from "../services/uploadService";
+import agent from "../api/agent";
+import { Meal } from "../types/recipe";
+import { AxiosError } from "axios";
 
-const UploadPdf = () => {
+type UploadPdfProps = {
+  onPdfProcessed: (meals: Meal[]) => void;
+};
+
+const UploadPdf = ({ onPdfProcessed }: UploadPdfProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,10 +44,17 @@ const UploadPdf = () => {
     setSuccess(null);
 
     try {
-      await uploadPdf(file);
+      const response = await agent.Process.uploadPdf(file);
       setSuccess("Plik został pomyślnie przesłany.");
-    } catch (error) {
-      setError(`Wystąpił błąd podczas przesyłania. ${error}`);
+      onPdfProcessed(response.preview_meals);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        setError(`Błąd przesyłania pliku: ${error.message}`);
+      } else if (error instanceof Error) {
+        setError(`Błąd przesyłania pliku: ${error.message}`);
+      } else {
+        setError("Wystąpił nieznany błąd przesyłania pliku.");
+      }
     } finally {
       setLoading(false);
     }
@@ -68,9 +81,9 @@ const UploadPdf = () => {
       >
         <input {...getInputProps()} />
         {file ? (
-          <Typography variant="body1">{file.name}</Typography>
+          <Typography>{file.name}</Typography>
         ) : (
-          <Typography variant="body1">
+          <Typography>
             Przeciągnij i upuść plik PDF tutaj lub kliknij
           </Typography>
         )}
@@ -81,7 +94,6 @@ const UploadPdf = () => {
 
       <Button
         variant="contained"
-        color="primary"
         onClick={handleUpload}
         disabled={loading || !file}
       >
