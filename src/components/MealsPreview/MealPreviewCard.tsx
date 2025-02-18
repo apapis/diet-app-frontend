@@ -1,7 +1,8 @@
+// src/components/MealsPreview/MealPreviewCard.tsx
 import { Box, TextField, Typography, Divider } from "@mui/material";
 import { Meal } from "../../types/recipe";
-import IngredientsList from "./IngredientsList";
 import InstructionsList from "./InstructionsList";
+import IngredientVariationsList from "./IngredientVariationsList";
 
 type MealPreviewCardProps = {
   meal: Meal;
@@ -29,8 +30,8 @@ export default function MealPreviewCard({
 
       <TextField
         label="Nazwa przepisu"
-        value={meal.recipe_name}
-        onChange={(e) => handleFieldChange("recipe_name", e.target.value)}
+        value={meal.name}
+        onChange={(e) => handleFieldChange("name", e.target.value)}
         fullWidth
         margin="normal"
       />
@@ -83,10 +84,13 @@ export default function MealPreviewCard({
 
       <Divider sx={{ my: 2 }} />
 
-      <IngredientsList
-        ingredients={meal.ingredients}
-        onChange={(updatedIngr) =>
-          handleFieldChange("ingredients", updatedIngr)
+      <Typography variant="body2" sx={{ mt: 2 }}>
+        Warianty składników:
+      </Typography>
+      <IngredientVariationsList
+        variations={meal.ingredient_variations}
+        onChange={(updatedVariations) =>
+          handleFieldChange("ingredient_variations", updatedVariations)
         }
       />
     </Box>

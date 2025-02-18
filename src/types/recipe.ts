@@ -5,20 +5,27 @@ export interface Ingredient {
   quantity: string;
   measure: string;
 }
+
+export interface IngredientVariation {
+  variation_label: string;
+  ingredients: Ingredient[];
+}
+
 export interface Meal {
   meal_type: MealType;
-  recipe_name: string;
-  ingredients: Ingredient[];
+  name: string;
+  ingredient_variations: IngredientVariation[];
   instructions: string[];
   calories: number;
   protein: number;
   fat: number;
   carbs: number;
-  incomplete: boolean;
 }
+
 export interface MealOut extends Meal {
   id: number;
 }
+
 export interface PdfUploadResponse {
   message: string;
   original_pdf: string;
@@ -33,7 +40,5 @@ export interface BulkMeal {
   protein: number;
   fat: number;
   carbs: number;
-  ingredient_variations: Array<{
-    ingredients: Ingredient[];
-  }>;
+  ingredient_variations: IngredientVariation[];
 }

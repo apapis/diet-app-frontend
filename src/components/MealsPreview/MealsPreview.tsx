@@ -1,4 +1,4 @@
-// MealsPreview.tsx
+// src/components/MealsPreview/MealsPreview.tsx
 import { useState } from "react";
 import { Box, Typography, Button, Alert } from "@mui/material";
 import agent from "../../api/agent";
@@ -7,7 +7,7 @@ import MealPreviewCard from "./MealPreviewCard";
 
 type MealsPreviewProps = {
   meals: Meal[];
-  onSaveSuccess: (message: string) => void; // nowy callback
+  onSaveSuccess: (message: string) => void;
 };
 
 export default function MealsPreview({
@@ -28,27 +28,22 @@ export default function MealsPreview({
   const transformToBulk = (): BulkMeal[] => {
     return editedMeals.map((meal) => ({
       meal_type: meal.meal_type,
-      name: meal.recipe_name,
+      name: meal.name,
       instructions: meal.instructions,
       calories: meal.calories,
       protein: meal.protein,
       fat: meal.fat,
       carbs: meal.carbs,
-      ingredient_variations: [{ ingredients: meal.ingredients }],
+      ingredient_variations: meal.ingredient_variations,
     }));
   };
 
   const handleSave = async () => {
     setErrorMessage(null);
-
     try {
       const payload = transformToBulk();
       const createdMeals = await agent.Meals.createBulk(payload);
-
-      // Pobieramy nazwy posiłków, które zostały zapisane:
-      const mealNames = createdMeals.map((meal) => meal.recipe_name).join(", ");
-
-      // Informujemy rodzica o pomyślnym zapisie, przekazując komunikat
+      const mealNames = createdMeals.map((meal) => meal.name).join(", ");
       onSaveSuccess(`Pomyślnie zapisano posiłki: ${mealNames}`);
     } catch (error) {
       console.error("Błąd zapisu posiłków:", error);
@@ -61,13 +56,11 @@ export default function MealsPreview({
       <Typography variant="h5" gutterBottom>
         Podgląd i edycja posiłków
       </Typography>
-
       {errorMessage && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {errorMessage}
         </Alert>
       )}
-
       {editedMeals.map((meal, i) => (
         <MealPreviewCard
           key={i}
@@ -76,7 +69,6 @@ export default function MealsPreview({
           index={i}
         />
       ))}
-
       <Button variant="contained" onClick={handleSave} sx={{ mt: 2 }}>
         Zapisz w bazie
       </Button>
